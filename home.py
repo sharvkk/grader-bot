@@ -1,4 +1,12 @@
 import streamlit as st
+from dotenv import load_dotenv
+
+load_dotenv()
+
+st.title("Welcome!")
+
+st.subheader("Please click on the button below to start with Grader Bot!")
 
 
-st.text("Hello")
+if st.button("START"):
+    st.switch_page("pages/assignment_ingest.py")
