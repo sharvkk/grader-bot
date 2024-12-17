@@ -1,7 +1,6 @@
 import streamlit as st
 from util.textract import load_pdf_text
 
-file_pending = True
 st.title("Provide solution")
 left, right = st.columns(2)
 
@@ -19,7 +18,6 @@ with left:
         st.session_state["current_golden_solution"] = load_pdf_text(file_path)
 
         st.text_area(label = "Extracted text", value = st.session_state.current_golden_solution, height = 300)
-        file_pending = False
 
 
 with right:
@@ -36,9 +34,6 @@ with right:
         st.session_state["current_textbook"] = load_pdf_text(file_path)
 
         # TODO: Add RAG
-
-        st.text_area(label = "Extracted text", value = st.session_state.current_textbook, height = 300)
-        file_pending = False
 
 
 if st.button("Proceed", disabled = (uploaded_solution is None) and (uploaded_textbook is None), use_container_width = True):
