@@ -1,7 +1,6 @@
 from langchain_core.tools import BaseTool
 from langchain_core.pydantic_v1 import BaseModel, Field
-from typing import Type, List, Dict
-from langchain.document_loaders import PyPDFLoader
+from typing import Type
 from langchain_core.prompts import PromptTemplate
 from langchain_core.output_parsers import JsonOutputParser, StrOutputParser
 from langchain_openai import ChatOpenAI
@@ -37,8 +36,8 @@ class SimpleTool(BaseTool):
         return self._run(input_data)
     
 class SimpleJsonTool(BaseTool):
-    name: str = "General_Assistant"
-    description: str = "Generic assistant"
+    name: str = "General_Json_Assistant"
+    description: str = "Generic Assistant Giving Json output"
     
     args_schema: Type[BaseModel] = SimpleInput
 

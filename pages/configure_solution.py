@@ -1,6 +1,11 @@
 import streamlit as st
 from util.textract import load_pdf_text
 
+st.set_page_config(
+    page_title="Grader BOT",
+    initial_sidebar_state="collapsed"
+)
+
 st.title("Provide solution")
 left, right = st.columns(2)
 

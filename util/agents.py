@@ -22,11 +22,12 @@ def create_grader_agent(model_name):
             ("system", system_message),
             MessagesPlaceholder("chat_history", optional=True),
             ("human", 
-             "You are given is the list of questions, and a set of solutions for each question, and a set of target answers to grade"
-             "Compare each solution with the answer for the corresponding question based on the given set of criterias."
-             "All the data you need (answer, question, solution and criteria) is: {input_data}\n"
-            "Assign grade points for each criterion. Grade points are measured in percentage score, so give every score in criteria out of 100."
-            "Assign 0 points for missing questions.\n\n"
+             "You are given the list of questions, and a set of solutions for each question, and a set of target answers to grade."
+             "Your job is to compare the solution and the target answer. In order to compare, first extract the list of points from the solution."
+             "After extracting different points, check whether these points are present in the target answer of the corresponding question."
+             "Assign score to each point extracted from the solution. Give 0 for points present in solution, but missing in answers."
+             "All the data you need (answer, question, solution) is: {input_data}\n"
+            "Assign 0 points for missing answers.\n\n"
             "Output a JSON object in the following format:\n"
             "{{"
             "    'grades': ["
@@ -34,10 +35,14 @@ def create_grader_agent(model_name):
             "            'question': '<actual question>',"
             "            'solution': '<actual solution>',"
             "            'answer': '<actual answer>,'"
-            "            '<criteria1 from list of criterias>': <score>,"
-            "            '<criteria2 from list of criterias>': <score>,"
-            "            '...': <score>,"
-            "            'grade_justification': '<justification of why you gave those points for each criteria. (keep it short)>',"
+            "            'notes': ["
+            "               {{"
+            "                   'point_solution': '<Extract text from the solution>',"
+            "                   'point_answer': '<Exract text from the answer which covers this point (should be empty if not covered)>',"
+            "                   'score': <score of whether the point is covered. Give partial points if partially covered>,"
+            "               }}"
+            "             ],"
+            "            'total_score': '<calculate score as average of all scores for each point>,'"
             "        }},"
             "        ..."
             "    ]"
@@ -67,11 +72,13 @@ def create_solution_agent(model_name):
             MessagesPlaceholder("chat_history", optional=True),
             ("human", 
              "You are given is the list of questions, and a textbook. Your task is to find and form the best solution by refering the texbook for each question."
-             "You are also given a list of criterias. Make sure your answer is perfect according to all the criterias in the list."
-             "You are also given a list of points for each question. Make sure to write each answer according to its maximum points."
+             "You are also given a list of maximum points for each question. Make sure to write each answer according to its maximum points."
              "For example, write short answers for small point questions."
-             "All the data you need (question, textbook and criteria) is: {input_data}\n"
-            "Give the output a text set of solutions for each question."
+             "All the data you need (question, textbook and max_points) is: {input_data}\n"
+            "Give the output strictly answers to each question and nothing more. Give your answers in a format:\n"
+            "'Answer 1. <Your answer>'\n'Answer 2. <Your answer>'\n..."
+            "Also keep your lenght of each answer stricly according to the maximum points. Your answer should be in the following range as per points:\n"
+            "5 points: 30-40 words, 10 points: 60-80 words, etc."
              ),
             MessagesPlaceholder("agent_scratchpad"),
         ]
@@ -123,5 +130,4 @@ async def run_agent(agent, user_query):
     user_query_str = json.dumps(user_query)
     print(agent.memory.chat_memory)
     print("********************")
-    print("user_query", user_query)
     return await agent.ainvoke(input={"input_data": user_query_str}, verbose=True)

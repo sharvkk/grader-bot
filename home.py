@@ -4,6 +4,10 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # TODO: Remove sidebar
+st.set_page_config(
+    page_title="Grader BOT",
+    initial_sidebar_state="collapsed"
+)
 
 st.title("Welcome!")
 
